@@ -2907,7 +2907,8 @@ ytd-button-renderer.redux-moved-info:first-of-type yt-icon,
 	customStyle.appendChild(document.createTextNode(customStyleInner));
 	document.documentElement.append(customStyle);
 
-	if (reduxSettings.favicon != "3") changeFavicon(reduxSettings.favicon);
+	// Always use favicon1 (dark red/maroon classic icon) — settings toggle not used
+	changeFavicon("1");
 	// if (reduxSettings.oldIcons) changeIcons();
 
 	// function changeIcons() {
