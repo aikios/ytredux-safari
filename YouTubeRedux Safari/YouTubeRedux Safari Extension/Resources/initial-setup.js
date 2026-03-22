@@ -2,7 +2,6 @@ let reduxSettings;
 let playerSize = {};
 let aspectRatio = (window.screen.width / window.screen.height).toFixed(2);
 let logoExtension;
-let browser = chrome || browser;
 const defaultSettings = {
 	"completedSettingsTutorial": false,
 	"gridItems": 6, 
@@ -25,7 +24,7 @@ const defaultSettings = {
 	"darkerRed": false, 
 	"immersiveFullscreen": false, 
 	"trueFullscreen": false, 
-	"favicon": 3, 
+	"favicon": 2,
 	"channelListView": false, 
 	"squareAvatar": true, 
 	"squareSubs": true,
@@ -45,7 +44,7 @@ const defaultSettings = {
 	"hideApps": false,
 	"classicLikesIconColors": false,
 	"hideJoinButton": false,
-	"hideClip": false,
+	"hideClip": true,
 	"hidePeopleSearch": true,
 	"trimSubs": false,
 	"trimViews": false,
@@ -1212,13 +1211,18 @@ function addCustomStyles() {
 			order: 99;
 			margin-left: auto;
 		}
+		/* share before three-dots: flexible(0) → share/top-level(1) → three-dots/button-shape(2) */
 		#above-the-fold #top-level-buttons-computed {
-			order: 2;
-		}
-		/* main buttons like save or clip */
-		#above-the-fold #flexible-item-buttons {
 			order: 1;
+		}
+		/* main buttons like save */
+		#above-the-fold #flexible-item-buttons {
+			order: 0;
 			display: flex;
+		}
+		/* hide clip button */
+		#above-the-fold ytd-button-renderer:has(button[aria-label="Clip"]) {
+			display: none !important;
 		}
 		#above-the-fold #flexible-item-buttons > * {
 			margin: 0;
@@ -1243,9 +1247,9 @@ function addCustomStyles() {
 		#above-the-fold #flexible-item-buttons > *:last-child {
 			padding-left: 0 !important;
 		}
-		/* misc button */
+		/* three-dots overflow — must come after share (#top-level-buttons-computed order:1) */
 		#above-the-fold #button-shape {
-			order: 1;
+			order: 2;
 		}
 		/* reverse the order within main buttons */
 		#above-the-fold #flexible-item-buttons > *:nth-child(1) {
@@ -2907,40 +2911,25 @@ ytd-button-renderer.redux-moved-info:first-of-type yt-icon,
 	customStyle.appendChild(document.createTextNode(customStyleInner));
 	document.documentElement.append(customStyle);
 
-	// Always use favicon1 (dark red/maroon classic icon) — settings toggle not used
-	changeFavicon("1");
-	// if (reduxSettings.oldIcons) changeIcons();
+	changeFavicon("2");
 
-	// function changeIcons() {
-
-	// 	function doStuff() {
-	// 		let changeFlags = setInterval(() => {
-	// 			if (yt) {
-	// 				yt.config_.EXPERIMENT_FLAGS.kevlar_system_icons = false;
-	// 				clearInterval(changeFlags);
-	// 			}
-	// 		}, 1000);
-	// 	}
-
-	// 	const script = document.createElement("script");
-	// 	script.id = 'redux-old-icons';
-	// 	script.text = `(${doStuff.toString()})();`;
-	// 	document.documentElement.appendChild(script);
-	// }
+	function applyFaviconDataUrl(dataUrl) {
+		document.querySelectorAll('link[rel="icon"], link[rel="shortcut icon"]').forEach(el => {
+			el.href = dataUrl;
+		});
+		const linkElement = document.createElement('link');
+		linkElement.rel = 'shortcut icon';
+		linkElement.href = dataUrl;
+		document.head.prepend(linkElement);
+		history.replaceState(null, '', location.href);
+	}
 
 	function changeFavicon(iconNumber) {
 		if (document.querySelector('link[rel="shortcut icon"]') == null) {
-			setTimeout(changeFavicon, 250);
+			setTimeout(() => changeFavicon(iconNumber), 250);
 			return;
 		}
-
-		let iconExtension = 'png';
-		if (iconNumber == "1") iconExtension = 'ico';
-		const iconUrl = browser.runtime.getURL(`/images/favicon${iconNumber}.${iconExtension}`);
-
-		// Safari ignores safari-web-extension:// URLs set as favicon hrefs.
-		// Fetch the asset and convert to a data: URL, then trigger a navigation
-		// event via history.replaceState so Safari picks up the new favicon.
+		const iconUrl = browser.runtime.getURL(`/images/favicon${iconNumber}.ico`);
 		fetch(iconUrl)
 			.then(r => r.blob())
 			.then(blob => new Promise((resolve) => {
@@ -2948,16 +2937,10 @@ ytd-button-renderer.redux-moved-info:first-of-type yt-icon,
 				reader.onloadend = () => resolve(reader.result);
 				reader.readAsDataURL(blob);
 			}))
-			.then(dataUrl => {
-				document.querySelectorAll('link[rel="icon"], link[rel="shortcut icon"]').forEach(el => {
-					el.href = dataUrl;
-				});
-				const linkElement = document.createElement('link');
-				linkElement.rel = 'icon';
-				linkElement.href = dataUrl;
-				document.head.prepend(linkElement);
-				// Trigger Safari favicon reload — Safari only picks up favicon changes on navigation events
-				history.replaceState(null, '', location.href);
+			.then(dataUrl => applyFaviconDataUrl(dataUrl))
+			.catch(() => {
+				// fetch of safari-web-extension:// URL failed — fall back to hardcoded base64
+				applyFaviconDataUrl('data:image/x-icon;base64,AAABAAEAICAAAAEAIAAyAgAAFgAAAIlQTkcNChoKAAAADUlIRFIAAAAgAAAAIAgGAAAAc3p69AAAAflJREFUeNrt171rU1EYBvB3am9y83lr/QARVIwo/glO/QcEKZQOLlI6WEEHHToWHI0iWrFaSgtFA4WIoKSgsZTU1pAOdkiVgA2B24o3QzIkwoXC43PhEupnD03oWTr8ngPnwPO+6xEAWh0sIAXL1Er/AnmG7zpladVXIXRIZUdvmi6SeOQjg9KEfZYikWXL7Cdo0i+5uJkiaJKSxXgwT9AkL+/jQZugavH4Ye/sFFvexoPbBBXZYz34sbWJxsZXFG+MIHsk5t23Y1vmY0Goyl5IwHXdlsa3LayP3sa7E0e99z2RNwxl5xNoNBq/aDabqG/aWLt1E5nemHqXT14xlJ07g1qt9lf1eh3fP69j5cqgeh9JmqGMCziO81/VahVfns/iZU9YqVPmogEoO3satm3vKjc9hTkrpNQpKYYyLlAul//p0/IHJC9fwqjZhReKnTLLUJY4hVKp9Ie1QgHjQ1cxEjWRDBvqfSQzDGWJkygWiy2FpSU84uBrvRbuhLoxrd7VIlORgEtQMXEohpWFBeTmM7g7OIDhiIkxsxtPvfe9ceVZJFAhqJigYSuKoUAXxkIGB/O+PRvyJBLIEVSNe2fn5ORxxJgkaDIpD8NGH0GTPnkQNjxJwj5Lksh9hm+AXtPqDg6hTc5vnRl/lnjkHkMf/Qsc/A31L/ATwu7aoFvPBVQAAAAASUVORK5CYII=');
 			});
 	}
 }

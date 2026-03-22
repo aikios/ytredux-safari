@@ -6,3 +6,5 @@ DerivedData/
 *.o
 *.a
 _chrome-source/
+.claude/
+LESSONS.md

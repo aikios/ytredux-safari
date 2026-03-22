@@ -843,3 +843,9 @@ html:not([dark]) #less-replies-sub-thread .yt-spec-button-shape-next--mono.yt-sp
 .ytSubThreadThreadline {
     opacity: 0 !important;
 }
+
+/* Normalize video context menu (three-dots) icons to a consistent gray */
+ytd-menu-popup-renderer yt-icon,
+ytd-menu-popup-renderer yt-icon-shape {
+    color: #909090 !important;
+}

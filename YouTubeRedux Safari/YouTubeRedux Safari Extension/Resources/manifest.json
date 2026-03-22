@@ -28,6 +28,13 @@
       {
         "matches": ["*://*.youtube.com/*"],
         "exclude_matches": ["*://*.youtube.com/embed/*"],
+        "js": ["player-flags.js"],
+        "run_at": "document_start",
+        "world": "MAIN"
+      },
+      {
+        "matches": ["*://*.youtube.com/*"],
+        "exclude_matches": ["*://*.youtube.com/embed/*"],
         "js": [
           "helpers/logger.js",
           "helpers/enums.js",
@@ -45,7 +52,7 @@
     ],
     "web_accessible_resources": [
       {
-        "resources": ["images/*", "helpers/resize.js"],
+        "resources": ["images/*", "helpers/resize.js", "player-flags.js"],
         "matches": ["*://*.youtube.com/*"]
       }
     ]

@@ -922,106 +922,6 @@ function adjustAmbient() {
 	cinematicsObserver.observe(cinematics, { childList: true });
 }
 
-// Restore classic YouTube player control icons.
-// The ytp-delhi-modern-icons experiment replaced flat Material Design icons with rounded
-// organic shapes. This function replaces SVG path data in each button with the classic
-// flat versions. A MutationObserver re-applies on play/pause/mute/fullscreen state changes.
-// CSS d: path() overrides are NOT used here — they are unreliable in Safari.
-function restorePlayerIcons() {
-	const player = document.querySelector('#movie_player');
-	if (!player) return;
-
-	// play/pause: viewBox 0 0 36 36 — all others: 0 0 24 24
-	const ICONS = {
-		play:         'M11 10v16l14-8z',
-		pause:        'M11 10h4v16h-4zm10 0h4v16h-4z',
-		volumeHigh:   'M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z',
-		volumeLow:    'M18.5 12c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM5 9v6h4l5 5V4L9 9H5zm7-.17v6.34L9.83 13H7v-2h2.83L12 8.83z',
-		muted:        'M16.5 12c0-1.77-1.02-3.29-2.5-4.03v2.21l2.45 2.45c.03-.2.05-.41.05-.63zm2.5 0c0 .94-.2 1.82-.54 2.64l1.51 1.51C20.63 14.91 21 13.5 21 12c0-4.28-2.99-7.86-7-8.77v2.06c2.89.86 5 3.54 5 6.71zM4.27 3L3 4.27 7.73 9H3v6h4l5 5v-6.73l4.25 4.25c-.67.52-1.42.93-2.25 1.18V21c1.39-.35 2.67-1.08 3.74-2.05L19.73 21 21 19.73l-9-9L4.27 3zM12 4L9.91 6.09 12 8.18V4z',
-		fullscreen:   'M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z',
-		fsExit:       'M5 16h3v3h2v-5H5v2zm3-8H5v2h5V5H8v3zm6 11h2v-3h3v-2h-5v5zm2-11V5h-2v5h5V8h-3z',
-		settings:     'M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94L14.4 2.81c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41L9.25 5.63c-.59.24-1.13.56-1.62.94L5.24 5.62c-.22-.08-.47 0-.59.22L2.74 9.16c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.07.63-.07.94 0 .31.02.64.07.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.03-1.58zM12 15.6c-1.98 0-3.58-1.6-3.58-3.6s1.6-3.58 3.58-3.58 3.58 1.6 3.58 3.58-1.6 3.6-3.58 3.6z',
-		captions:     'M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm-9 8H9.5v-.5h-2v3h2V14H11v1c0 .55-.45 1-1 1H7c-.55 0-1-.45-1-1v-4c0-.55.45-1 1-1h3c.55 0 1 .45 1 1v1zm7 0h-1.5v-.5h-2v3h2V14H18v1c0 .55-.45 1-1 1h-3c-.55 0-1-.45-1-1v-4c0-.55.45-1 1-1h3c.55 0 1 .45 1 1v1z',
-		theater:      'M19 6H5c-1.1 0-2 .9-2 2v8c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm0 10H5V8h14v8z',
-		theaterExit:  'M21 3H3c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h18c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H3V5h18v14z',
-	};
-
-	function setIcon(selector, d) {
-		const btn = player.querySelector(selector);
-		if (!btn) return;
-		const svg = btn.querySelector('svg');
-		if (!svg) return;
-		svg.querySelectorAll('path').forEach(p => p.remove());
-		const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
-		path.setAttribute('d', d);
-		path.setAttribute('fill', 'white');
-		svg.appendChild(path);
-	}
-
-	// applying stays true for 250ms after each apply to break the observer feedback loop
-	let applying = false;
-
-	function applyIcons() {
-		if (applying) return;
-		applying = true;
-
-		const isPaused = player.classList.contains('paused-mode');
-		setIcon('.ytp-play-button', isPaused ? ICONS.play : ICONS.pause);
-
-		const muteBtn = player.querySelector('.ytp-mute-button');
-		if (muteBtn) {
-			const label = (muteBtn.getAttribute('aria-label') || '').toLowerCase();
-			if (label.includes('unmute')) {
-				setIcon('.ytp-mute-button', ICONS.muted);
-			} else {
-				const slider = player.querySelector('.ytp-volume-slider');
-				const vol = slider ? parseFloat(slider.getAttribute('aria-valuenow') || '100') : 100;
-				setIcon('.ytp-mute-button', vol < 50 ? ICONS.volumeLow : ICONS.volumeHigh);
-			}
-		}
-
-		const fsBtn = player.querySelector('.ytp-fullscreen-button');
-		const inFs = fsBtn && (fsBtn.getAttribute('aria-label') || '').toLowerCase().includes('exit');
-		setIcon('.ytp-fullscreen-button', inFs ? ICONS.fsExit : ICONS.fullscreen);
-
-		setIcon('.ytp-settings-button', ICONS.settings);
-		setIcon('.ytp-subtitles-button', ICONS.captions);
-
-		const sizeBtn = player.querySelector('.ytp-size-button');
-		const inTheater = sizeBtn && (sizeBtn.getAttribute('aria-label') || '').toLowerCase().includes('default');
-		setIcon('.ytp-size-button', inTheater ? ICONS.theaterExit : ICONS.theater);
-
-		// Hold the lock for 250ms so observer callbacks caused by our own DOM changes don't re-trigger
-		setTimeout(() => { applying = false; }, 250);
-	}
-
-	applyIcons();
-
-	// Re-apply when player class changes (paused-mode, fullscreen, etc.)
-	new MutationObserver(() => {
-		if (!applying) applyIcons();
-	}).observe(player, { attributes: true, attributeFilter: ['class'] });
-
-	// Re-apply when YouTube replaces SVG paths inside the control bar (play/pause toggle, mute)
-	const controlBar = player.querySelector('.ytp-chrome-controls');
-	if (controlBar) {
-		new MutationObserver(() => {
-			if (!applying) applyIcons();
-		}).observe(controlBar, { subtree: true, childList: true });
-	}
-
-	// Re-apply when mute/fullscreen button aria-label changes
-	const btnsToWatch = ['.ytp-mute-button', '.ytp-fullscreen-button', '.ytp-size-button'];
-	btnsToWatch.forEach(sel => {
-		const btn = player.querySelector(sel);
-		if (btn) {
-			new MutationObserver(() => {
-				if (!applying) applyIcons();
-			}).observe(btn, { attributes: true, attributeFilter: ['aria-label'] });
-		}
-	});
-}
-
 function main() {
     // Thanks to arnavbhate for this code - https://github.com/omnidevZero/YouTubeRedux/issues/324#issuecomment-3569626163
     let url = new URL(window.location.href);
@@ -1094,7 +994,7 @@ function main() {
 	if (reduxSettings.myChannel) {
 		waitForElement('#guide ytd-guide-section-renderer:first-child #items', 100, insertMyChannel);
 	}
-	if (reduxSettings.hideClip && pageLocation === PAGE_LOCATION.Video) {
+	if (pageLocation === PAGE_LOCATION.Video) {
 		waitForElement('#info path[d="M8,7c0,0.55-0.45,1-1,1S6,7.55,6,7c0-0.55,0.45-1,1-1S8,6.45,8,7z M7,16c-0.55,0-1,0.45-1,1c0,0.55,0.45,1,1,1s1-0.45,1-1 C8,16.45,7.55,16,7,16z M10.79,8.23L21,18.44V20h-3.27l-5.76-5.76l-1.27,1.27C10.89,15.97,11,16.47,11,17c0,2.21-1.79,4-4,4 c-2.21,0-4-1.79-4-4c0-2.21,1.79-4,4-4c0.42,0,0.81,0.08,1.19,0.2l1.37-1.37l-1.11-1.11C8,10.89,7.51,11,7,11c-2.21,0-4-1.79-4-4 c0-2.21,1.79-4,4-4c2.21,0,4,1.79,4,4C11,7.43,10.91,7.84,10.79,8.23z M10.08,8.94L9.65,8.5l0.19-0.58C9.95,7.58,10,7.28,10,7 c0-1.65-1.35-3-3-3S4,5.35,4,7c0,1.65,1.35,3,3,3c0.36,0,0.73-0.07,1.09-0.21L8.7,9.55l0.46,0.46l1.11,1.11l0.71,0.71l-0.71,0.71 L8.9,13.91l-0.43,0.43l-0.58-0.18C7.55,14.05,7.27,14,7,14c-1.65,0-3,1.35-3,3c0,1.65,1.35,3,3,3s3-1.35,3-3 c0-0.38-0.07-0.75-0.22-1.12l-0.25-0.61L10,14.8l1.27-1.27l0.71-0.71l0.71,0.71L18.15,19H20v-0.15L10.08,8.94z M17.73,4H21v1.56 l-5.52,5.52l-2.41-2.41L17.73,4z M18.15,5l-3.67,3.67l1,1L20,5.15V5H18.15z"]', 100, hideClip);
 	}
 	if (reduxSettings.hideThanks && pageLocation === PAGE_LOCATION.Video) {
@@ -1121,9 +1021,7 @@ function main() {
 	if (!reduxSettings.ignoreAmbientAdjustment && getTheme() === THEME.Dark && pageLocation === PAGE_LOCATION.Video) {
 		waitForElement('#cinematics', 10, adjustAmbient);
 	}
-	if (pageLocation === PAGE_LOCATION.Video) {
-		waitForElement('#movie_player .ytp-chrome-controls .ytp-play-button', 10, restorePlayerIcons);
-	}
+
 }
 
 (() => {

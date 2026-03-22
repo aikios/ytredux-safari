@@ -31,6 +31,7 @@
 		E0A1FA7D2F6F760A00803F59 /* config.html in Resources */ = {isa = PBXBuildFile; fileRef = E0A1FA6F2F6F760A00803F59 /* config.html */; };
 		E0A1FA7E2F6F760A00803F59 /* changelog.js in Resources */ = {isa = PBXBuildFile; fileRef = E0A1FA702F6F760A00803F59 /* changelog.js */; };
 		E0A1FA7F2F6F760A00803F59 /* helpers in Resources */ = {isa = PBXBuildFile; fileRef = E0A1FA712F6F760A00803F59 /* helpers */; };
+		E0A1FA802F6F760A00803F59 /* player-flags.js in Resources */ = {isa = PBXBuildFile; fileRef = E0A1FA812F6F760A00803F59 /* player-flags.js */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -71,20 +72,21 @@
 		E0A1FA522F6F760900803F59 /* YouTubeRedux Safari Extension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = "YouTubeRedux Safari Extension.appex"; sourceTree = BUILT_PRODUCTS_DIR; };
 		E0A1FA572F6F760900803F59 /* SafariWebExtensionHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SafariWebExtensionHandler.swift; sourceTree = "<group>"; };
 		E0A1FA592F6F760900803F59 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		E0A1FA642F6F760A00803F59 /* popup.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; name = popup.js; path = "../../_chrome-source/Chrome/popup.js"; sourceTree = "<group>"; };
-		E0A1FA652F6F760A00803F59 /* changelog.html */ = {isa = PBXFileReference; lastKnownFileType = text.html; name = changelog.html; path = "../../_chrome-source/Chrome/changelog.html"; sourceTree = "<group>"; };
-		E0A1FA662F6F760A00803F59 /* LICENSE */ = {isa = PBXFileReference; lastKnownFileType = text; name = LICENSE; path = "../../_chrome-source/Chrome/LICENSE"; sourceTree = "<group>"; };
-		E0A1FA672F6F760A00803F59 /* styles.css */ = {isa = PBXFileReference; lastKnownFileType = text.css; name = styles.css; path = "../../_chrome-source/Chrome/styles.css"; sourceTree = "<group>"; };
-		E0A1FA682F6F760A00803F59 /* background.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; name = background.js; path = "../../_chrome-source/Chrome/background.js"; sourceTree = "<group>"; };
-		E0A1FA692F6F760A00803F59 /* images */ = {isa = PBXFileReference; lastKnownFileType = folder; name = images; path = "../../_chrome-source/Chrome/images"; sourceTree = "<group>"; };
-		E0A1FA6A2F6F760A00803F59 /* popup.html */ = {isa = PBXFileReference; lastKnownFileType = text.html; name = popup.html; path = "../../_chrome-source/Chrome/popup.html"; sourceTree = "<group>"; };
-		E0A1FA6B2F6F760A00803F59 /* config.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; name = config.js; path = "../../_chrome-source/Chrome/config.js"; sourceTree = "<group>"; };
-		E0A1FA6C2F6F760A00803F59 /* main.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; name = main.js; path = "../../_chrome-source/Chrome/main.js"; sourceTree = "<group>"; };
-		E0A1FA6D2F6F760A00803F59 /* initial-setup.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; name = "initial-setup.js"; path = "../../_chrome-source/Chrome/initial-setup.js"; sourceTree = "<group>"; };
-		E0A1FA6E2F6F760A00803F59 /* manifest.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; name = manifest.json; path = "../../_chrome-source/Chrome/manifest.json"; sourceTree = "<group>"; };
-		E0A1FA6F2F6F760A00803F59 /* config.html */ = {isa = PBXFileReference; lastKnownFileType = text.html; name = config.html; path = "../../_chrome-source/Chrome/config.html"; sourceTree = "<group>"; };
-		E0A1FA702F6F760A00803F59 /* changelog.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; name = changelog.js; path = "../../_chrome-source/Chrome/changelog.js"; sourceTree = "<group>"; };
-		E0A1FA712F6F760A00803F59 /* helpers */ = {isa = PBXFileReference; lastKnownFileType = folder; name = helpers; path = "../../_chrome-source/Chrome/helpers"; sourceTree = "<group>"; };
+		E0A1FA642F6F760A00803F59 /* popup.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; name = popup.js; path = Resources/popup.js; sourceTree = "<group>"; };
+		E0A1FA652F6F760A00803F59 /* changelog.html */ = {isa = PBXFileReference; lastKnownFileType = text.html; name = changelog.html; path = Resources/changelog.html; sourceTree = "<group>"; };
+		E0A1FA662F6F760A00803F59 /* LICENSE */ = {isa = PBXFileReference; lastKnownFileType = text; name = LICENSE; path = Resources/LICENSE; sourceTree = "<group>"; };
+		E0A1FA672F6F760A00803F59 /* styles.css */ = {isa = PBXFileReference; lastKnownFileType = text.css; name = styles.css; path = Resources/styles.css; sourceTree = "<group>"; };
+		E0A1FA682F6F760A00803F59 /* background.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; name = background.js; path = Resources/background.js; sourceTree = "<group>"; };
+		E0A1FA692F6F760A00803F59 /* images */ = {isa = PBXFileReference; lastKnownFileType = folder; name = images; path = Resources/images; sourceTree = "<group>"; };
+		E0A1FA6A2F6F760A00803F59 /* popup.html */ = {isa = PBXFileReference; lastKnownFileType = text.html; name = popup.html; path = Resources/popup.html; sourceTree = "<group>"; };
+		E0A1FA6B2F6F760A00803F59 /* config.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; name = config.js; path = Resources/config.js; sourceTree = "<group>"; };
+		E0A1FA6C2F6F760A00803F59 /* main.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; name = main.js; path = Resources/main.js; sourceTree = "<group>"; };
+		E0A1FA6D2F6F760A00803F59 /* initial-setup.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; name = "initial-setup.js"; path = "Resources/initial-setup.js"; sourceTree = "<group>"; };
+		E0A1FA6E2F6F760A00803F59 /* manifest.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; name = manifest.json; path = Resources/manifest.json; sourceTree = "<group>"; };
+		E0A1FA6F2F6F760A00803F59 /* config.html */ = {isa = PBXFileReference; lastKnownFileType = text.html; name = config.html; path = Resources/config.html; sourceTree = "<group>"; };
+		E0A1FA702F6F760A00803F59 /* changelog.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; name = changelog.js; path = Resources/changelog.js; sourceTree = "<group>"; };
+		E0A1FA712F6F760A00803F59 /* helpers */ = {isa = PBXFileReference; lastKnownFileType = folder; name = helpers; path = Resources/helpers; sourceTree = "<group>"; };
+		E0A1FA812F6F760A00803F59 /* player-flags.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; name = "player-flags.js"; path = "Resources/player-flags.js"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -174,6 +176,7 @@
 				E0A1FA6F2F6F760A00803F59 /* config.html */,
 				E0A1FA702F6F760A00803F59 /* changelog.js */,
 				E0A1FA712F6F760A00803F59 /* helpers */,
+				E0A1FA812F6F760A00803F59 /* player-flags.js */,
 			);
 			name = Resources;
 			path = "YouTubeRedux Safari Extension";
@@ -292,6 +295,7 @@
 				E0A1FA732F6F760A00803F59 /* changelog.html in Resources */,
 				E0A1FA7F2F6F760A00803F59 /* helpers in Resources */,
 				E0A1FA762F6F760A00803F59 /* background.js in Resources */,
+				E0A1FA802F6F760A00803F59 /* player-flags.js in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -466,8 +470,10 @@
 		E0A1FA5D2F6F760900803F59 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "-";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = K4QWBR2FT9;
 				ENABLE_APP_SANDBOX = YES;
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_USER_SELECTED_FILES = readonly;
@@ -486,7 +492,7 @@
 					"-framework",
 					SafariServices,
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.ahmad.YouTubeRedux-Safari.Extension;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.ahmad.YouTubeRedux-Safari.Extension";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
@@ -500,8 +506,10 @@
 		E0A1FA5E2F6F760900803F59 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "-";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = K4QWBR2FT9;
 				ENABLE_APP_SANDBOX = YES;
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_USER_SELECTED_FILES = readonly;
@@ -520,7 +528,7 @@
 					"-framework",
 					SafariServices,
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.ahmad.YouTubeRedux-Safari.Extension;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.ahmad.YouTubeRedux-Safari.Extension";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
@@ -536,9 +544,11 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "-";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = K4QWBR2FT9;
 				ENABLE_APP_SANDBOX = YES;
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_OUTGOING_NETWORK_CONNECTIONS = YES;
@@ -577,9 +587,11 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "-";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = K4QWBR2FT9;
 				ENABLE_APP_SANDBOX = YES;
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_OUTGOING_NETWORK_CONNECTIONS = YES;
