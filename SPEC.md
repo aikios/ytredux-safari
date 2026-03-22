@@ -139,20 +139,31 @@ Six active observers in `main.js`:
 |---|---|---|
 | `chrome.storage.sync` | `browser.storage.sync` | Direct 1:1 replacement |
 | `chrome.storage.local` | `browser.storage.local` | Direct 1:1 replacement |
-| `chrome.runtime.getURL()` | `browser.runtime.getURL()` | Direct 1:1 replacement |
+| `chrome.runtime.getURL()` | `browser.runtime.getURL()` | Direct 1:1 replacement — **never** use `chrome.runtime.getURL` |
 | `chrome.runtime.sendMessage()` | `browser.runtime.sendMessage()` | Direct 1:1 replacement |
 | `chrome.runtime.onMessage` | `browser.runtime.onMessage` | Direct 1:1 replacement |
 | `chrome.runtime.onInstalled` | `browser.runtime.onInstalled` | Direct 1:1 replacement |
 | `chrome.tabs.create()` | `browser.tabs.create()` | Direct 1:1 replacement |
 | `chrome.scripting.executeScript()` | `browser.scripting.executeScript()` | Supported in Safari 16+ (MV3) |
 | `chrome.downloads` | `browser.downloads` | Supported; fallback: use `<a download>` trick |
-| `chrome-extension://` URL scheme | `safari-web-extension://` | **Only** appears in static `styles.css` — dynamic CSS in `initial-setup.js` already uses `browser.runtime.getURL()` which resolves correctly |
+| `chrome-extension://` URL scheme | `safari-web-extension://` | Must be rewritten at runtime — see below |
 
 ### The `let browser = chrome || browser` Pattern
 The Chrome extension uses this in `background.js`. **Remove it entirely.** In Safari, `browser` is the global — `chrome` does not exist. Simply use `browser` directly.
 
-### `chrome-extension://` in CSS
-The static `styles.css` has one hard-coded `chrome-extension://` URL for the autoplay checkbox toggle image. Replace with the `browser.runtime.getURL()` approach: inject this rule dynamically from `initial-setup.js` instead of hardcoding it in the static CSS file.
+### `chrome-extension://` URLs in CSS (Lesson from OldTwitter Port)
+The static `styles.css` has one hard-coded `chrome-extension://` URL for the autoplay checkbox toggle image. **Do not rely on a static scheme string.** Instead:
+1. Move this rule to dynamic injection in `initial-setup.js`
+2. Derive the correct scheme at runtime: `browser.runtime.getURL("").split("://")[0]` → `"safari-web-extension"`
+3. Build the full URL with `browser.runtime.getURL("images/...")` which resolves correctly on all platforms
+
+Any CSS blocks in `allStyles` that reference extension images must use `browser.runtime.getURL()` to build the URL string dynamically — never hardcode the scheme.
+
+### Favicon Replacement (Lesson from OldTwitter Port)
+The Chrome extension manipulates `<link rel="icon">` hrefs to swap YouTube's favicon. In Safari:
+- **Safari ignores `safari-web-extension://` URLs set as favicon hrefs** — this will silently fail
+- **Use a `data:image/x-icon;base64,...` URL** embedded directly in the `href`
+- **Trigger favicon reload** with `history.replaceState(null, '', location.href)` after setting the href — Safari only picks up favicon changes on navigation events. Use `null` as state (not `history.state`) to avoid non-serializable data errors
 
 ---
 
@@ -287,6 +298,17 @@ Test each feature in Safari with the YouTube live site:
 | Private browsing windows cannot be controlled by extensions | Known limitation; document in UI |
 | `player.setInternalSize()` API may behave differently in Safari's YouTube | Test and add fallback CSS-only resize if needed |
 | App Store review may reject if functionality breaks | Test thoroughly before submission |
+| `chrome-extension://` URLs in CSS silently produce broken images | Always use `browser.runtime.getURL()` for all extension asset URLs; never hardcode scheme |
+| Favicon set via extension URL silently ignored by Safari | Use `data:` URL for favicon; trigger reload with `history.replaceState(null, '', location.href)` |
+| DNR redirects don't intercept cached requests | When debugging asset replacement, always test with `Develop → Empty Caches` in Safari |
+
+---
+
+## Debugging Guidelines (Lessons from OldTwitter Port)
+
+- **Prefix all debug logs**: Use `[YTRedux DEBUG]` prefix on all temporary `console.log` lines — makes grepping and bulk-removal easy before shipping
+- **Test cache-sensitive fixes with a visually obvious asset first**: When debugging image/favicon replacement, swap in a solid black square first to confirm the mechanism works before using the real asset. Separates "mechanism broken" from "asset too subtle to notice"
+- **Clear cache before concluding a fix doesn't work**: Safari caches aggressively. `Develop → Empty Caches` before every test of resource replacement (images, icons, favicons). A working fix can look broken due to stale cache
 
 ---
 
