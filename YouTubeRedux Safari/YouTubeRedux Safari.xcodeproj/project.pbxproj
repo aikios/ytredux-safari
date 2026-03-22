@@ -486,7 +486,7 @@
 					"-framework",
 					SafariServices,
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.ahmad.YouTubeReduxSafari.Extension;
+				PRODUCT_BUNDLE_IDENTIFIER = com.ahmad.YouTubeRedux-Safari.Extension;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
@@ -520,7 +520,7 @@
 					"-framework",
 					SafariServices,
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.ahmad.YouTubeReduxSafari.Extension;
+				PRODUCT_BUNDLE_IDENTIFIER = com.ahmad.YouTubeRedux-Safari.Extension;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
