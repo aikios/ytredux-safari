@@ -258,17 +258,17 @@ function addCustomStyles() {
 		ytd-topbar-logo-renderer > #logo,
 		#start > #masthead-logo,
 		#masthead > #masthead-logo {
-			content: url('${browser.runtime.getURL(`/images/${reduxSettings.classicLogoChoice}logo.${logoExtension}`)}') !important;
+			content: url('${browser.runtime.getURL(`/images/2011logo.svg`)}') !important;
 			width: 72px !important;
 			padding: 18px 14px 18px 16px !important;
 		}
-		ytd-masthead[dark] #logo-icon-container, 
-		html[dark] #contentContainer #logo-icon-container, 
-		ytd-masthead[dark] ytd-topbar-logo-renderer > #logo, 
+		ytd-masthead[dark] #logo-icon-container,
+		html[dark] #contentContainer #logo-icon-container,
+		ytd-masthead[dark] ytd-topbar-logo-renderer > #logo,
 		html[dark] ytd-topbar-logo-renderer > #logo,
 		html[dark] #start > #masthead-logo,
 		html[dark] #masthead > #masthead-logo {
-			content: url('${browser.runtime.getURL(`/images/${reduxSettings.classicLogoChoice}logo-dark.${logoExtension}`)}') !important;
+			content: url('${browser.runtime.getURL(`/images/2011logo-dark.svg`)}') !important;
 			width: 72px !important;
 			padding: 18px 14px 18px 16px !important;
 		}
@@ -2877,7 +2877,7 @@ function addCustomStyles() {
 		let mergedOptions = '';
 		for (let i = 0; i < Object.keys(allStyles).length; i++) {
 			const currentKey = Object.keys(allStyles)[i];
-			if (currentKey === 'classicLogoChoice' && reduxSettings[currentKey] == '2017') continue;
+			if (currentKey === 'classicLogoChoice') { mergedOptions += Object.values(allStyles)[i]; continue; }
 			if (reduxSettings[currentKey]) {
 				mergedOptions += Object.values(allStyles)[i];
 			}
