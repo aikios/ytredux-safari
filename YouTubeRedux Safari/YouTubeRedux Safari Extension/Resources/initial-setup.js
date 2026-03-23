@@ -2924,9 +2924,10 @@ ytd-button-renderer.redux-moved-info:first-of-type yt-icon,
 		history.replaceState(null, '', location.href);
 	}
 
-	function changeFavicon(iconNumber) {
+	function changeFavicon(iconNumber, retryCount = 0) {
 		if (document.querySelector('link[rel="shortcut icon"]') == null) {
-			setTimeout(() => changeFavicon(iconNumber), 250);
+			if (retryCount >= 20) return;
+			setTimeout(() => changeFavicon(iconNumber, retryCount + 1), 250);
 			return;
 		}
 		const iconUrl = browser.runtime.getURL(`/images/favicon${iconNumber}.ico`);

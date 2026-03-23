@@ -23,6 +23,9 @@ playerSize.width = reduxSettings.smallPlayerWidth == undefined ? 853 : reduxSett
 playerSize.height = Math.ceil(playerSize.width / aspectRatio);
 let observerComments;
 let observerRelated;
+let observerPlaylistItems;
+let viewsObserver;
+let hideShortsObserver;
 let intervalsArray = [];
 let isCheckingRecalc = false;
 
@@ -142,7 +145,7 @@ function changeLikesCounter() {
 
 	const loop = setInterval(() => {
 		fixLikes();
-	}, 20);
+	}, 200);
 
 	setTimeout(() => {
 		if (loop != undefined) {
@@ -177,22 +180,27 @@ function recalculateVideoSize() {
 				setTimeout(alignItems, 40); //TODO slow systems may struggle with this timeout when exiting fullscreen - properly detect mode change
 			});
 		}
-		document.addEventListener("fullscreenchange", function() {
-			startRecalc();
-			setTimeout(alignItems, 40);
-		});
-		window.addEventListener('resize', () => {
-			let repeatInsert = setInterval(() => { //insert in loop for X seconds to prevent YT from overriding
-				let specialWidth = document.querySelector('video').offsetWidth;
-				let specialHeight = document.querySelector('video').offsetHeight;
-				insertRecalcScript(specialWidth, specialHeight);
-			}, 500);
-			setTimeout(() => {
-				clearInterval(repeatInsert);
-			}, 2000);
-			alignItems();
-		});
-		flags.recalcListenersAdded = true;
+
+		if (!flags.recalcListenersAdded) {
+			document.addEventListener("fullscreenchange", function() {
+				startRecalc();
+				setTimeout(alignItems, 40);
+			});
+			let resizeInterval;
+			window.addEventListener('resize', () => {
+				clearInterval(resizeInterval); //debounce: clear any previous resize interval before creating a new one
+				resizeInterval = setInterval(() => { //insert in loop for X seconds to prevent YT from overriding
+					let specialWidth = document.querySelector('video').offsetWidth;
+					let specialHeight = document.querySelector('video').offsetHeight;
+					insertRecalcScript(specialWidth, specialHeight);
+				}, 500);
+				setTimeout(() => {
+					clearInterval(resizeInterval);
+				}, 2000);
+				alignItems();
+			});
+			flags.recalcListenersAdded = true;
+		}
 	}
 
 	function insertRecalcScript(width, height) {
@@ -465,9 +473,10 @@ function rearrangeInfo() {
 }
 
 function addMissingVideoPageElements() {
-	//move to description observer instead of interval
-	const loop = setInterval(() => {
+	function updateElements() {
 		const viewsAndDate = document.querySelector('#description tp-yt-paper-tooltip:not([disable-upgrade]) > #tooltip');
+		if (!viewsAndDate) return false;
+
 		const views = viewsAndDate.innerText.split('•')[0];
 		const date = viewsAndDate.innerText.split('•')[1];
 		const reduxViewsLikesContainer = document.querySelector('#redux-video-stats');
@@ -489,16 +498,24 @@ function addMissingVideoPageElements() {
 			reduxViewsLikesContainer.append(likeBar);
 
 			if (reduxSettings.compatibleDislikesRe) {
-				updateDislikes(); //move outside the inverval/observer to avoid spamming calls?
+				updateDislikes();
 			}
 		}
-	}, 100);
+		return true;
+	}
 
-	setTimeout(() => {
-		if (loop != undefined) {
-			clearInterval(loop);
+	if (updateElements()) return;
+
+	const descriptionEl = document.querySelector('#description') || document.querySelector('#primary-inner');
+	if (!descriptionEl) return;
+
+	const observer = new MutationObserver(() => {
+		if (updateElements()) {
+			observer.disconnect();
 		}
-	}, 10000);
+	});
+	observer.observe(descriptionEl, { childList: true, subtree: true });
+	setTimeout(() => observer.disconnect(), 10000);
 }
 
 function clearStoredIntervals() {
@@ -605,7 +622,8 @@ function sortPlaylists() {
 				let observerConfig = {
 					childList: true
 				};
-				let observerPlaylistItems = new MutationObserver(reorderNewPlaylistItems);
+				if (observerPlaylistItems) observerPlaylistItems.disconnect();
+				observerPlaylistItems = new MutationObserver(reorderNewPlaylistItems);
 				observerPlaylistItems.observe(itemsContainer, observerConfig);
 			}, baseTimeout*2);
 		}
@@ -674,7 +692,8 @@ function trimViews() {
 
 	modifyViews();
 
-	let viewsObserver = new MutationObserver(modifyViews);
+	if (viewsObserver) viewsObserver.disconnect();
+	viewsObserver = new MutationObserver(modifyViews);
 	viewsObserver.observe(views, {attributes: true});
 }
 
@@ -826,32 +845,25 @@ function formatNumber(number) {
 }
 
 function updateDislikes() {
-	let buttonsContainer = document.querySelector('#top-level-buttons-computed');
-	let observerConfig = {
-		childList: true
-	};
-	let observerLikes = new MutationObserver(update);
-	observerLikes.observe(buttonsContainer, observerConfig); //not used anyway? needs investigation
-
 	update();
 
 	if (reduxSettings.showRawValues) {
 		let checkIfChanged = setInterval(() => {
-			let dislikesSource = document.querySelector('#top-level-buttons-computed .ryd-tooltip:last-of-type #tooltip') || document.querySelector('ytd-video-primary-info-renderer #top-level-buttons-computed #segmented-dislike-button span'); 
+			let dislikesSource = document.querySelector('#top-level-buttons-computed .ryd-tooltip:last-of-type #tooltip') || document.querySelector('ytd-video-primary-info-renderer #top-level-buttons-computed #segmented-dislike-button span');
 			if (!dislikesSource) return;
-			
+
 			let dislikes = document.querySelector('#above-the-fold dislike-button-view-model div[class*="text-content"]');
 			let dislikesCount = dislikesSource.innerText.match(/(?<=\/).*/) ? dislikesSource.innerText.match(/(?<=\/).*/)[0].trim() : dislikesSource.innerText;
-			
+
 			if (dislikes) {
 				dislikes.innerText = formatNumber(dislikesCount.replace(/[,.\s]/g, ''));
 			}
-		}, 20);
+		}, 150);
 		setTimeout(() => {
 			if (checkIfChanged) {
 				clearInterval(checkIfChanged);
 			}
-		}, 5000);
+		}, 3000);
 	}
 
 	function update() {
@@ -882,12 +894,13 @@ function updateLikesBar(likesCount, dislikesCount) {
 
 function hideShortsInSearch() {
 	const searchContents = document.querySelector('#contents.ytd-section-list-renderer');
-	const observer = new MutationObserver(hideRows);
+	if (hideShortsObserver) hideShortsObserver.disconnect();
+	hideShortsObserver = new MutationObserver(hideRows);
 	const observerOptions = {
 		childList: true,
 		subtree: true
 	};
-	observer.observe(searchContents, observerOptions);
+	hideShortsObserver.observe(searchContents, observerOptions);
 	hideRows();
 
 	function hideRows() {
@@ -1042,6 +1055,10 @@ function main() {
 			YTReduxURLPath = location.pathname;
 			YTReduxURLSearch = location.search;
 			flags.likesChanged = false;
+
+			if (observerPlaylistItems) { observerPlaylistItems.disconnect(); observerPlaylistItems = null; }
+			if (viewsObserver) { viewsObserver.disconnect(); viewsObserver = null; }
+			if (hideShortsObserver) { hideShortsObserver.disconnect(); hideShortsObserver = null; }
 
 			if (reduxSettings.disableInfiniteScrolling) {
 				if (observerComments != undefined) {
